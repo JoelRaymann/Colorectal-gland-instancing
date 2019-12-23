@@ -1,0 +1,10 @@
+# Ignore folders
+.ipynb_checkpoints
+.idea
+model_save
+model_save_archive
+output_logs
+
+# Files
+*.ipynb
+*.png

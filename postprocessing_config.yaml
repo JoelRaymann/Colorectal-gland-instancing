@@ -1,0 +1,37 @@
+########################### INSTRUCTIONS #######################
+# This is a post processing configuration file which allows    #
+# the user to control which postprocessing methods to apply    #
+# Check each option and change according. To disable a data    #
+# postprocessing method - set enabled: False. To set their     #
+# order of execution - set order: <the execution order>        #
+########################### END ################################
+
+# NOTE: Applying Morphological configurations. Will be using disk filters unless mentioned custom in filter
+# Erosion Operation
+Erosion:
+  enabled: False
+  filter: "custom" # Options include ["disk" | "custom"]
+  iterations: 3
+  order: 2 # Options include [-1 => for disabled. {0, inf} for order]
+
+# Dilation Operation
+Dilation:
+  enabled: False
+  filter: "disk"
+  iterations: 1
+  order: 1
+
+# Opening Operation
+Opening:
+  enabled: True
+  filter: "disk"
+  iterations: 1
+  order: 0
+
+# Closing Operation
+Closing:
+  enabled: False
+  filter: "disk"
+  iterations: 1
+  order: 3
+

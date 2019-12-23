@@ -1,0 +1,64 @@
+########################### INSTRUCTIONS #######################
+# This is a data augmentation configuration file which allows  #
+# the user to control which augmentation methods to apply      #
+# Check each option and change according. The augmentation     #
+# used is albumentation library. please read the albumentation #
+# documentation for more info. To disable a data augmentation  #
+# method - set p: 0.0.                                         #
+########################### END ################################
+
+
+# NOTE: Applying Color Augmentations
+# HSV Saturation
+HSV_Saturation:
+  hue_shift_limit: 10
+  sat_shift_limit: 20
+  val_shift_limit: 10
+  always_apply: False
+  p: 0.5
+# Random Brightness Contrast
+Random_Brightness_Contrast:
+  brightness_limit: 0.2
+  contrast_limit: 0.2
+  brightness_by_max: True
+  always_apply: False
+  p: 0.5
+
+# NOTE: Applying Scale, Shift, Rotation, Flip augmentation
+# Flip
+Flip:
+  always_apply: False
+  p: 0.5
+# Shift Scale and Rotation
+Linear_Augmentation:
+  always_apply: False
+  p: 0.0
+
+# NOTE: Applying Blurs and Noise
+# Median Blur
+Median_Blur:
+  blur_limit: 7
+  always_apply: False
+  p: 0.5
+# Gaussian_Blur
+Gaussian_Blur:
+  blur_limit: 7
+  always_apply: False
+  p: 0.5
+# Gaussian_Noise
+Gaussian_Noise:
+  var_limit_low: 10.0
+  var_limit_high: 50.0
+  mean: 0  
+  always_apply: False
+  p: 0.5
+# Motion_Blur
+Motion_Blur:
+  blur_limit: 3
+  always_apply: False
+  p: 0.0
+
+# NOTE: Elastic Blur - computationally heavy, use with better hardware
+Elastic_Blur:
+  always_apply: False
+  p: 0.5
