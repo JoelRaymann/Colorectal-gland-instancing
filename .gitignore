@@ -1,9 +1,10 @@
 # Ignore folders
-.ipynb_checkpoints
-.idea
-model_save
-model_save_archive
-output_logs
+.ipynb_checkpoints/
+.idea/
+model_save/
+model_save_archive/
+model_save_archive-v2/
+output_logs/
 
 # Files
 *.ipynb

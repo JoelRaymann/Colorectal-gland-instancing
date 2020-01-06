@@ -22,13 +22,14 @@ class DataGenerator(tf.keras.utils.Sequence):
         :param dataset_path_set: The list of tuples consisting of (image, map, overlay) paths.
         :param image_size: A tuple mentioning the size of the images as (W, H)
         :param resize: A integer to resize the image.
-        :param model_name: The name of the model to be trained - {"UNet", "MIMO-Net"}
+        :param model_name: The name of the model to be trained - {"UNet", "MIMO-Net", "UNet-Attention"}
         :param batch_size: the size of the batch to process (default: 32)
         :param aug_config_path: The configuration yaml path for the augmentation (default: None)
         :param enable_patching: A status flag to use patch extraction instead of resize. (default: False)
         :param apply_augmentation: The status flag for enabling augmentation (default: True)
         :param shuffle: The status flag for enabling shuffling (default: True)
         """
+        np.random.seed(100)
         self.dataset_path_set = dataset_path_set
         self.image_size = image_size
         self.resize = resize
@@ -277,8 +278,9 @@ class DataGenerator(tf.keras.utils.Sequence):
         dataset_paths = [self.dataset_path_set[element] for element in indexes]
 
         # Generate the dataset
-        if self.model_name == "UNet":
+        if self.model_name == "UNet" or self.model_name == "UNet-Attention":
             inp, out = self.__load_data_unet(dataset_paths=dataset_paths)
+
         elif self.model_name == "MIMO-Net":
             return self.__load_data_mimonet(dataset_paths=dataset_paths)
         else:

@@ -1,9 +1,12 @@
 # Import necessary packages
 import tensorflow as tf
 
-def UNet(input_size=(256, 256, 3)):
+import layers
+
+
+def UNetAttention(input_size=(464, 464, 3)):
     """
-    Function to build and return the standard
+    Function to build and return the Attention based
     U-Net models with the given input_size
 
     :param input_size: A tuple consisting of the input dimensions eg. (464, 464, 3)
@@ -30,8 +33,8 @@ def UNet(input_size=(256, 256, 3)):
     # Level - 4 down
     conv4 = tf.keras.layers.Conv2D(512, 3, activation="elu", padding="same", name="L4_conv1")(pool3)
     conv4 = tf.keras.layers.Conv2D(512, 3, activation="elu", padding="same", name="L4_conv2")(conv4)
-    drop4 = tf.keras.layers.Dropout(0.5)(conv4)
-    pool4 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), name="L4_pool")(drop4)
+    # drop4 = tf.keras.layers.Dropout(0.5)(conv4)
+    pool4 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), name="L4_pool")(conv4)
 
     # Bottleneck layers
     conv5 = tf.keras.layers.Conv2D(1024, 3, activation="elu", padding="same", name="L5_conv1")(pool4)
@@ -40,30 +43,34 @@ def UNet(input_size=(256, 256, 3)):
 
     # Level - 4 up
     up4 = tf.keras.layers.Conv2DTranspose(512, 2, strides=(2, 2), activation="elu", name="U4_convT1")(drop5)
-    merge4 = tf.keras.layers.Concatenate(axis=-1, name="U4_merge")([drop4, up4])
+    attn4, attn4_map = layers.AttentionLayer(attn_unit=512, name="U4_attn")(conv4, up4)
+    merge4 = tf.keras.layers.Concatenate(axis=-1, name="U4_merge")([attn4, up4])
     up4 = tf.keras.layers.Conv2D(512, 3, activation="elu", padding="same", name="U4_conv1")(merge4)
     up4 = tf.keras.layers.Conv2D(512, 3, activation="elu", padding="same", name="U4_conv2")(up4)
 
     # Level - 3 up
     up3 = tf.keras.layers.Conv2DTranspose(256, 2, strides=(2, 2), activation="elu", name="U3_convT1")(up4)
-    merge3 = tf.keras.layers.Concatenate(axis=-1, name="U3_merge")([conv3, up3])
+    attn3, attn3_map = layers.AttentionLayer(attn_unit=256, name="U3_attn")(conv3, up3)
+    merge3 = tf.keras.layers.Concatenate(axis=-1, name="U3_merge")([attn3, up3])
     up3 = tf.keras.layers.Conv2D(256, 3, activation="elu", padding="same", name="U3_conv1")(merge3)
     up3 = tf.keras.layers.Conv2D(256, 3, activation="elu", padding="same", name="U3_conv2")(up3)
 
     # Level - 2 up
     up2 = tf.keras.layers.Conv2DTranspose(128, 2, strides=(2, 2), activation="elu", name="U2_convT1")(up3)
-    merge2 = tf.keras.layers.Concatenate(axis=-1, name="U2_merge")([conv2, up2])
+    attn2, attn2_map = layers.AttentionLayer(attn_unit=128, name="U2_attn")(conv2, up2)
+    merge2 = tf.keras.layers.Concatenate(axis=-1, name="U2_merge")([attn2, up2])
     up2 = tf.keras.layers.Conv2D(128, 3, activation="elu", padding="same", name="U2_conv1")(merge2)
     up2 = tf.keras.layers.Conv2D(128, 3, activation="elu", padding="same", name="U2_conv2")(up2)
 
     # Level - 1 up
     up1 = tf.keras.layers.Conv2DTranspose(64, 2, strides=(2, 2), activation="elu", name="U1_convT1")(up2)
-    merge1 = tf.keras.layers.Concatenate(axis=-1, name="U1_merge")([conv1, up1])
+    attn1, attn1_map = layers.AttentionLayer(attn_unit=64, name="U1_attn")(conv1, up1)
+    merge1 = tf.keras.layers.Concatenate(axis=-1, name="U1_merge")([attn1, up1])
     up1 = tf.keras.layers.Conv2D(64, 3, activation="elu", padding="same", name="U1_conv1")(merge1)
     up1 = tf.keras.layers.Conv2D(64, 3, activation="elu", padding="same", name="U1_conv2")(up1)
 
     # output layers
-    drop_y = tf.keras.layers.Dropout(0.5, name = "output_drop")(up1)
+    drop_y = tf.keras.layers.Dropout(0.5, name="output_drop")(up1)
     y = tf.keras.layers.Conv2D(1, 1, activation="sigmoid", padding="same", name="output_layer")(drop_y)
 
     return tf.keras.Model(inputs=X, outputs=y)

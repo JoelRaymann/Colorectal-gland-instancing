@@ -46,6 +46,7 @@ def new_train_model(config: dict):
     steps_per_epoch = config["steps_per_epoch"]
     image_width = config["image_width"]
     image_height = config["image_height"]
+    load_prev_weights = config["load_prev_weights"]
     resize = config["resize"]
 
     print("[INFO]: Using config: \n", config)
@@ -107,7 +108,15 @@ def new_train_model(config: dict):
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint("./model_save/{0}/checkpoints/{0}_checkpoint.h5".format(model_name), period = 1, save_weights_only=True)
     best_model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint("./model_save/{0}/best_model/best_{0}_checkpoint.h5".format(model_name), save_best_only = True, save_weights_only=True)
     model_save_path = "./model_save/{0}/saved_model/".format(model_name)
+    print("[INFO]: Saving graph of the %s model" %(model_name))
+    tf.keras.utils.plot_model(model, to_file = "{0}_plot.png".format(model_name), show_shapes=True)
 
+    if load_prev_weights != "":
+        print("[INFO]: Loading Previous weights for training:")
+        load_prev_weights = load_prev_weights + "best_model/best_UNet_checkpoint.h5"
+        model.load_weights(load_prev_weights, by_name=True)
+
+    print("[INFO]: Training the model")
     # Train model
     try:
         model.fit_generator(train_gen,
@@ -130,16 +139,17 @@ def new_train_model(config: dict):
         del model
         sys.exit(2)
 
-        # Model saving
+    # Model saving
     model.save_weights(filepath=model_save_path + "{0}_weights.h5".format(model_name))
-    model.save(filepath=model_save_path + "{0}.h5".format(model_name))
 
     # Testing Results
+    print("[+] Loading the best model")
+    model.load_weights(filepath="./model_save/{0}/best_model/best_{0}_checkpoint.h5".format(model_name))
     print("[+] Testing the model")
     loss, accuracy, dice_index = model.evaluate_generator(test_gen, verbose=1)
     print("[+] Test Loss: ", loss)
-    print("[+] Test Accuracy: ", accuracy)
-    print("[+] Dice Index: ", dice_index)
+    print("[+] Test Pixel-Accuracy: ", accuracy)
+    print("[+] Test Dice Index: ", dice_index)
 
 def resume_train_model(model_path: str, resume_epoch:int, config: dict):
     """
@@ -177,6 +187,7 @@ def resume_train_model(model_path: str, resume_epoch:int, config: dict):
     steps_per_epoch = config["steps_per_epoch"]
     image_width = config["image_width"]
     image_height = config["image_height"]
+    load_prev_weights = config["load_prev_weights"]
     resize = config["resize"]
 
     print("[INFO]: Using config: \n", config)
@@ -240,7 +251,15 @@ def resume_train_model(model_path: str, resume_epoch:int, config: dict):
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint("./model_save/{0}/checkpoints/{0}_checkpoint.h5".format(model_name), period = 1, save_weights_only=True)
     best_model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint("./model_save/{0}/best_model/best_{0}_checkpoint.h5".format(model_name), save_best_only = True, save_weights_only=True)
     model_save_path = "./model_save/{0}/saved_model/".format(model_name)
+    print("[INFO]: Saving graph of the %s model" % (model_name))
+    tf.keras.utils.plot_model(model, to_file="{0}_plot.png".format(model_name), show_shapes=True)
 
+    if load_prev_weights != "":
+        print("[INFO]: Loading Previous weights for training:")
+        load_prev_weights = load_prev_weights + "best_model/best_UNet_checkpoint.h5"
+        model.load_weights(load_prev_weights, by_name=True)
+
+    print("[INFO]: Training the model")
     # Train model
     try:
         model.fit_generator(train_gen,
@@ -264,13 +283,14 @@ def resume_train_model(model_path: str, resume_epoch:int, config: dict):
         del model
         sys.exit(2)
 
-        # Model saving
+    # Model saving
     model.save_weights(filepath=model_save_path + "{0}_weights.h5".format(model_name))
-    model.save(filepath=model_save_path + "{0}.h5".format(model_name))
 
     # Testing Results
+    print("[+] Loading the best model")
+    model.load_weights(filepath="./model_save/{0}/best_model/best_{0}_checkpoint.h5".format(model_name))
     print("[+] Testing the model")
     loss, accuracy, dice_index = model.evaluate_generator(test_gen, verbose=1)
     print("[+] Test Loss: ", loss)
-    print("[+] Test Accuracy: ", accuracy)
-    print("[+] Dice Index: ", dice_index)
+    print("[+] Test Pixel-Accuracy: ", accuracy)
+    print("[+] Test Dice Index: ", dice_index)

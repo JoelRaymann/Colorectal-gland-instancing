@@ -6,6 +6,7 @@ import tensorflow as tf
 from .MIMONet import MIMO_Net
 # Import in-house models
 from .UNet import UNet
+from .UNetAttention import UNetAttention
 
 
 def ModelSelector(model_name: str, input_size = (464, 464, 3)) -> tf.keras.Model:
@@ -27,6 +28,9 @@ def ModelSelector(model_name: str, input_size = (464, 464, 3)) -> tf.keras.Model
 
     if model_name == "UNet":
         return UNet(input_size)
+
+    elif model_name == "UNet-Attention":
+        return UNetAttention(input_size)
 
     elif model_name == "MIMO-Net":
         return MIMO_Net(input_size)

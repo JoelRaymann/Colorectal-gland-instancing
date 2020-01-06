@@ -1,8 +1,8 @@
-no_of_epochs: 45
-learning_rate: 0.0001
+no_of_epochs: 30
+learning_rate: 0.00001
 train_batch_size: 2
-test_batch_size: 1
-model_name: "MIMO-Net"
+test_batch_size: 2
+model_name: "UNet-Attention"
 GPUs: 1
 threads: 0
 dataset_family: "CRAG"
@@ -10,4 +10,5 @@ dataset_path: "../Datasets/CRAG/"
 steps_per_epoch: 1000
 image_width: 256
 image_height: 256
+load_prev_weights: "./model_save/UNet/"
 resize: 300

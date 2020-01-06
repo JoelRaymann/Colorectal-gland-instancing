@@ -59,8 +59,8 @@ if __name__ == "__main__":
         exit(1)
 
     if load_model_path == "":
-        train_utilities.new_train_model(config=config)
-        print("[INFO]: Proceeding to resume training from {0} epoch".format(resume_epoch))
-    else:
         print("[INFO]: Proceeding to train {0} model from scratch".format(config["model_name"]))
+        train_utilities.new_train_model(config=config)
+    else:
+        print("[INFO]: Proceeding to resume training from {0} epoch".format(resume_epoch))
         train_utilities.resume_train_model(model_path=load_model_path, resume_epoch=resume_epoch, config=config)
